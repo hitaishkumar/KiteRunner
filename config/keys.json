@@ -1,0 +1,12 @@
+{
+  "shortcuts": {
+    "menu": "e",
+    "goto_dashboard": "d",
+    "goto_login": "l",
+    "refresh": "r",
+    "close_menu": "x",
+    "quit": "q",
+    "goto_instruments": "t",
+    "goto_quotes": "k"
+  }
+}
