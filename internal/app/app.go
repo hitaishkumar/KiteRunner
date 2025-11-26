@@ -23,8 +23,6 @@ func New() *model.App {
 		FooterRight: tview.NewTextView(),
 	}
 
-	// app.UpdateFooter() <<-- cause go routine deadlock
-
 	// Load user profile JSON
 	userData, err := loadFullProfile()
 	if err != nil {

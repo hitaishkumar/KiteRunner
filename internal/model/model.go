@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -109,6 +110,78 @@ type MenuItem struct {
 	Action   func(a *App)
 }
 
+func BuildFuzzyModal(a *App, items []MenuItem) *tview.Frame {
+	inputField := tview.NewInputField()
+	inputField.SetBorder(true).SetBorderPadding(0, 0, 1, 1)
+	inputField.SetFieldBackgroundColor(tcell.ColorBlack)
+
+	list := tview.NewList()
+	list.SetBorder(true).SetBorderPadding(1, 1, 1, 1)
+
+	// maintain filteredItems state to invoke action on ENTER
+	filteredItems := make([]MenuItem, 0)
+	filterHandler := func(currentText string) {
+		list.Clear()
+		filteredItems = filteredItems[:0]
+		for _, item := range items {
+			if strings.Contains(strings.ToLower(item.Title), currentText) {
+				filteredItems = append(filteredItems, item)
+				list.AddItem(item.Title, "", 0, nil)
+			}
+		}
+	}
+	inputField.SetChangedFunc(filterHandler)
+	// initalize filter as empty
+	filterHandler("")
+
+	// hanlde forward input enter to focused items' action invokation
+	inputField.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter {
+			idx := list.GetCurrentItem()
+			if idx >= 0 {
+				selectedItem := filteredItems[idx]
+				if selectedItem.Action != nil {
+					// invoke the action
+					selectedItem.Action(a)
+					// close the modal
+					CloseFuzzyModal(a)
+				}
+			}
+		}
+	})
+
+	modalContent := tview.NewFlex()
+	modalContent.SetDirection(tview.FlexRow)
+	modalContent.AddItem(inputField, 3, 0, true)
+	modalContent.AddItem(list, 0, 1, false)
+
+	frame := tview.NewFrame(modalContent)
+	frame.SetBorders(1, 1, 1, 1, 2, 2)
+	frame.SetBorder(true)
+	frame.SetTitle(fmt.Sprintf("%s %s", a.CurrentPage, "Menu"))
+	frame.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEsc {
+			CloseFuzzyModal(a)
+			return nil
+		}
+		return event
+	})
+
+	return frame
+}
+
+func OpenFuzzyModal(a *App, modal *tview.Frame) {
+	centered := tview.NewGrid().
+		SetRows(0, 30, 0).    // middle row height
+		SetColumns(0, 80, 0). // middle column width
+		AddItem(modal, 1, 1, 1, 1, 0, 0, true)
+	a.Pages.AddPage("fuzzy menu", centered, true, true)
+}
+
+func CloseFuzzyModal(a *App) {
+	a.Pages.RemovePage("fuzzy menu")
+}
+
 func GlobalMenu(a *App, items []MenuItem) *tview.List {
 
 	// FORCE list to be *tview.List (not Primitive)
@@ -154,12 +227,12 @@ func OpenDashboardMenu(a *App) {
 
 	switch a.CurrentPage {
 	case "login":
-		menu := GlobalMenu(a, GetLoginMenuItems(a))
-		OpenMenu(a, menu)
+		menu := BuildFuzzyModal(a, GetLoginMenuItems(a))
+		OpenFuzzyModal(a, menu)
 		return
 	case "dashboard":
-		menu := GlobalMenu(a, GetDashboardMenuItems(a))
-		OpenMenu(a, menu)
+		menu := BuildFuzzyModal(a, GetDashboardMenuItems(a))
+		OpenFuzzyModal(a, menu)
 		return
 	}
 }
