@@ -48,6 +48,9 @@ func (a *App) Run() error {
 			return ev
 		}
 
+		if page, _ := a.Pages.GetFrontPage(); page == "fuzzy menu" {
+			return ev // let modal handle ESC
+		}
 		// Toggle into Insert Mode
 		if ev.Key() == tcell.KeyRune && ev.Rune() == 'i' && a.Mode == ModeNavigation {
 			a.Mode = ModeInsert
@@ -111,60 +114,124 @@ type MenuItem struct {
 }
 
 func BuildFuzzyModal(a *App, items []MenuItem) *tview.Frame {
-	inputField := tview.NewInputField()
-	inputField.SetBorder(true).SetBorderPadding(0, 0, 1, 1)
-	inputField.SetFieldBackgroundColor(tcell.ColorBlack)
+	// ---------- UI PRIMITIVES ----------
+	input := tview.NewInputField()
+	input.SetBorder(true).SetBorderPadding(0, 0, 1, 1)
+	input.SetFieldBackgroundColor(tcell.ColorBlack)
 
 	list := tview.NewList()
-	list.SetBorder(true).SetBorderPadding(1, 1, 1, 1)
+	list.SetBorder(true).
+		SetBorderPadding(1, 1, 1, 1)
 
-	// maintain filteredItems state to invoke action on ENTER
-	filteredItems := make([]MenuItem, 0)
-	filterHandler := func(currentText string) {
+	// ---------- FILTERED STATE ----------
+	var filtered []MenuItem
+
+	filter := func(text string) {
 		list.Clear()
-		filteredItems = filteredItems[:0]
+		filtered = filtered[:0]
+
+		lower := strings.ToLower(text)
+
 		for _, item := range items {
-			if strings.Contains(strings.ToLower(item.Title), currentText) {
-				filteredItems = append(filteredItems, item)
+			if strings.Contains(strings.ToLower(item.Title), lower) {
+				filtered = append(filtered, item)
 				list.AddItem(item.Title, "", 0, nil)
 			}
 		}
-	}
-	inputField.SetChangedFunc(filterHandler)
-	// initalize filter as empty
-	filterHandler("")
 
-	// hanlde forward input enter to focused items' action invokation
-	inputField.SetDoneFunc(func(key tcell.Key) {
+		if len(filtered) > 0 {
+			list.SetCurrentItem(0)
+		}
+	}
+
+	input.SetChangedFunc(filter)
+	filter("") // initial fill
+
+	// ---------- SELECTION HANDLER ----------
+	selectItem := func(idx int) {
+		if idx < 0 || idx >= len(filtered) {
+			return
+		}
+
+		if filtered[idx].Action != nil {
+			filtered[idx].Action(a)
+		}
+		CloseFuzzyModal(a)
+
+		a.Mode = ModeNavigation
+		a.UpdateFooter()
+	}
+
+	// ENTER action on input
+	input.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
-			idx := list.GetCurrentItem()
-			if idx >= 0 {
-				selectedItem := filteredItems[idx]
-				if selectedItem.Action != nil {
-					// invoke the action
-					selectedItem.Action(a)
-					// close the modal
-					CloseFuzzyModal(a)
-				}
-			}
+			selectItem(list.GetCurrentItem())
 		}
 	})
 
-	modalContent := tview.NewFlex()
-	modalContent.SetDirection(tview.FlexRow)
-	modalContent.AddItem(inputField, 3, 0, true)
-	modalContent.AddItem(list, 0, 1, false)
+	// ENTER action on list
+	list.SetSelectedFunc(func(i int, _, _ string, _ rune) {
+		selectItem(i)
+	})
 
-	frame := tview.NewFrame(modalContent)
+	// ---------- KEYBINDINGS (ESC, i, j, k) ----------
+	frame := tview.NewFrame(tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(input, 3, 0, true).
+		AddItem(list, 0, 1, false),
+	)
+
 	frame.SetBorders(1, 1, 1, 1, 2, 2)
 	frame.SetBorder(true)
 	frame.SetTitle(fmt.Sprintf("%s %s", a.CurrentPage, "Menu"))
-	frame.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyEsc {
+
+	frame.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {
+		switch ev.Key() {
+
+		case tcell.KeyEsc:
+			// INSERT → NAV & focus list
+			if a.Mode == ModeInsert {
+				a.Mode = ModeNavigation
+				a.UpdateFooter()
+				a.TUI.SetFocus(list)
+				return nil
+			}
+			// NAV → close modal
 			CloseFuzzyModal(a)
 			return nil
+
+		case tcell.KeyRune:
+			switch ev.Rune() {
+
+			case 'i':
+				if a.Mode == ModeNavigation {
+					a.Mode = ModeInsert
+					a.UpdateFooter()
+					a.TUI.SetFocus(input)
+					return nil
+				}
+
+			case 'j': // MOVE DOWN
+				if a.Mode == ModeNavigation {
+					i := list.GetCurrentItem()
+					if i < list.GetItemCount()-1 {
+						list.SetCurrentItem(i + 1)
+					}
+					return nil
+				}
+
+			case 'k': // MOVE UP
+				if a.Mode == ModeNavigation {
+					i := list.GetCurrentItem()
+					if i > 0 {
+						list.SetCurrentItem(i - 1)
+					}
+					return nil
+				}
+			}
 		}
-		return event
+
+		return ev
 	})
 
 	return frame
@@ -176,6 +243,9 @@ func OpenFuzzyModal(a *App, modal *tview.Frame) {
 		SetColumns(0, 80, 0). // middle column width
 		AddItem(modal, 1, 1, 1, 1, 0, 0, true)
 	a.Pages.AddPage("fuzzy menu", centered, true, true)
+	// FORCE modal to start in Insert mode
+	a.Mode = ModeInsert
+	a.UpdateFooter()
 }
 
 func CloseFuzzyModal(a *App) {
