@@ -29,7 +29,7 @@ func Login(a *model.App) tview.Primitive {
 
 	apiField.SetLabel("API Key")
 	apiField.SetFieldWidth(40)
-	apiField.SetText("")
+	apiField.SetText("Add Your API Key Here")
 	apiField.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {
 		// BLOCK input if NOT in insert mode
 		if a.Mode == model.ModeNavigation {
@@ -43,7 +43,7 @@ func Login(a *model.App) tview.Primitive {
 	accessField := tview.NewInputField()
 	accessField.SetLabel("Access Token")
 	accessField.SetFieldWidth(40)
-	accessField.SetText("")
+	accessField.SetText("Add YOur access TOken here")
 	accessField.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {
 		if a.Mode == model.ModeNavigation {
 			return nil
@@ -70,37 +70,6 @@ func Login(a *model.App) tview.Primitive {
 	form.SetBorder(true).
 		SetTitle(" Kite Login ").
 		SetTitleAlign(tview.AlignLeft)
-
-	// ----------------------------------
-	// INPUT MODE TOGGLE LOGIC
-	// ----------------------------------
-
-	form.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {
-
-		switch ev.Rune() {
-		case 'i': // ENTER INSERT MODE
-			a.Mode = model.ModeInsert
-			a.UpdateFooter()
-			return nil
-
-		case 'n': // ENTER NAVIGATION MODE
-			a.Mode = model.ModeNavigation
-			a.UpdateFooter()
-			return nil
-		}
-
-		// In navigation mode block non-nav keys globally
-		if a.Mode == model.ModeNavigation {
-			// Allow only movement + enter
-			switch ev.Key() {
-			case tcell.KeyUp, tcell.KeyDown, tcell.KeyEnter, tcell.KeyTab, tcell.KeyBacktab:
-				return ev
-			}
-			return nil
-		}
-
-		return ev
-	})
 
 	// ----------------------------------
 	// FINAL PAGE LAYOUT (banner + form + footer)

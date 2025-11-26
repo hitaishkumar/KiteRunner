@@ -1,7 +1,6 @@
 package model
 
 import (
-	"KiteRunner/internal/config"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
@@ -20,21 +19,28 @@ type App struct {
 	Pages       *tview.Pages
 	UserProfile FullProfile
 	Mode        UIMode
+	CurrentPage string
 
 	FooterLeft  *tview.TextView
 	FooterRight *tview.TextView
+	Footer      *tview.Flex
 }
 
 // Run MUST be in same package as App
 func (a *App) Run() error {
 
 	// Set initial footer BEFORE entering event loop
+	a.CurrentPage = "login"
 	a.FooterLeft.SetDynamicColors(true)
-	a.FooterLeft.SetText("  Mode: [yellow]NAVIGATION  (i = insert, ESC = navigate)").SetTextAlign(tview.AlignLeft)
-	a.FooterRight.SetText("  Menu ( m )").SetTextAlign(tview.AlignRight)
+	a.FooterRight.SetDynamicColors(true)
+
+	a.Mode = ModeInsert
+	a.UpdateFooter()
+	a.FooterRight.SetText("[blue]Menu ( m )").SetTextAlign(tview.AlignRight)
+
+	footer := BuildFooter(a.FooterLeft, a.FooterRight)
 
 	// Deafult satrt mode
-	a.Mode = ModeInsert
 
 	a.TUI.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {
 		if ev == nil {
@@ -59,6 +65,18 @@ func (a *App) Run() error {
 			OpenDashboardMenu(a)
 			return nil
 		}
+
+		// In INSERT mode → allow typing
+		if a.Mode == ModeInsert {
+			return ev
+		}
+
+		// In NAV mode → allow only NAV keys
+		switch ev.Key() {
+		case tcell.KeyUp, tcell.KeyDown, tcell.KeyEnter, tcell.KeyTab, tcell.KeyBacktab:
+			return ev
+		}
+
 		// In Insert mode: let events pass to focused primitive (typing)
 		return ev
 
@@ -68,8 +86,7 @@ func (a *App) Run() error {
 	root := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(a.Pages, 0, 1, true).
-		AddItem(a.FooterLeft, 1, 0, false).
-		AddItem(a.FooterRight, 1, 0, false)
+		AddItem(footer, 1, 0, false)
 
 	return a.TUI.SetRoot(root, true).Run()
 }
@@ -92,14 +109,14 @@ type MenuItem struct {
 	Action   func(a *App)
 }
 
-func BuildMenu(a *App, items []MenuItem) *tview.List {
+func GlobalMenu(a *App, items []MenuItem) *tview.List {
 
 	// FORCE list to be *tview.List (not Primitive)
 	list := tview.NewList()
 	list.
 		SetSelectedBackgroundColor(tcell.ColorBlue).
 		SetBorder(true).
-		SetTitle(" Menu ").
+		SetTitle(fmt.Sprintf("%s %s", " Menu ", a.CurrentPage)).
 		SetTitleAlign(tview.AlignLeft)
 
 	// Add menu items
@@ -135,55 +152,34 @@ func CloseMenu(a *App) {
 
 func OpenDashboardMenu(a *App) {
 
-	items := []MenuItem{
-		{
-			Title:    "Dashboard",
-			Shortcut: rune(config.C.Shortcuts.GotoDashboard[0]),
-			Action: func(a *App) {
-				a.Pages.SwitchToPage("dashboard")
-				CloseMenu(a)
-			},
-		},
-		{
-			Title:    "Login Page",
-			Shortcut: rune(config.C.Shortcuts.GotoLogin[0]),
-			Action: func(a *App) {
-				a.Pages.SwitchToPage("login")
-				CloseMenu(a)
-			},
-		},
-		{
-			Title:    "Close Menu",
-			Shortcut: 'x', // add to config if needed
-			Action: func(a *App) {
-				CloseMenu(a)
-			},
-		},
-		{
-			Title:    "Quit",
-			Shortcut: rune(config.C.Shortcuts.Quit[0]),
-			Action: func(a *App) {
-				a.TUI.Stop()
-			},
-		},
-		{
-			Title:    "Instruments",
-			Shortcut: rune(config.C.Shortcuts.GoToInstruments[0]),
-			Action: func(a *App) {
-				a.Pages.SwitchToPage("instruments")
-				CloseMenu(a)
-			},
-		},
-		{
-			Title:    "Quotes",
-			Shortcut: rune(config.C.Shortcuts.GoToQuotes[0]),
-			Action: func(a *App) {
-				a.Pages.SwitchToPage("quotes")
-				CloseMenu(a)
-			},
-		},
+	switch a.CurrentPage {
+	case "login":
+		menu := GlobalMenu(a, GetLoginMenuItems(a))
+		OpenMenu(a, menu)
+		return
+	case "dashboard":
+		menu := GlobalMenu(a, GetDashboardMenuItems(a))
+		OpenMenu(a, menu)
+		return
 	}
+}
 
-	menu := BuildMenu(a, items)
-	OpenMenu(a, menu)
+// BuildFooter creates a footer bar with two text areas: left + right.
+func BuildFooter(leftTextView, rightTextView *tview.TextView) tview.Primitive {
+
+	// Flex row with 2 columns
+	content := tview.NewFlex().
+		SetDirection(tview.FlexColumn).
+		AddItem(leftTextView, 0, 1, false). // expand left
+		AddItem(rightTextView, 0, 1, false) // expand right
+
+	// Overlay content on box using Flex (footerBox is fixed height)
+	footer := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(content, 1, 1, false) // height = 1 row
+		// If you want border around full footer: add Box behind content
+	// footer.SetBorder(true)
+	footer.SetBorderColor(tcell.ColorDarkRed)
+
+	return footer
 }

@@ -11,7 +11,6 @@ import (
 )
 
 func Dashboard(a *model.App) tview.Primitive {
-
 	userData := a.UserProfile // ← Clean + works
 
 	// -----------------------------
