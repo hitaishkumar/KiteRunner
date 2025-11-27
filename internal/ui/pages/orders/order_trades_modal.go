@@ -35,7 +35,7 @@ func OpenOrderTradesModal(a *model.App, trades []model.OrderTrade, order model.O
 	}
 
 	// ROWS
-	for i, t := range filtered {
+	for i, t := range trades {
 		r := i + 1
 		table.SetCell(r, 0, cell(t.TradeID))
 		table.SetCell(r, 1, statusCell(t.TransactionType))
@@ -55,11 +55,10 @@ func OpenOrderTradesModal(a *model.App, trades []model.OrderTrade, order model.O
 	frame.SetTitleAlign(tview.AlignLeft)
 
 	// Make the frame modal-sized
-	modal := tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 1, false).
-		AddItem(frame, 20, 1, true). // height = 20 rows, centered
-		AddItem(nil, 0, 1, false)
+	modal := tview.NewGrid().
+		SetRows(0, 20, 0).    // middle row height
+		SetColumns(0, 90, 0). // middle column width
+		AddItem(frame, 1, 1, 1, 1, 0, 0, true)
 
 	// CLOSE HANDLER
 	modal.SetInputCapture(func(ev *tcell.EventKey) *tcell.EventKey {

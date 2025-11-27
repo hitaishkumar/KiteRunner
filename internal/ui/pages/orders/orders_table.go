@@ -117,7 +117,7 @@ func AllOrdersTable(a *model.App, orders []model.Order) *tview.Table {
 				}
 
 				return nil
-			case 'k':
+			case 'o':
 				selected, _ := table.GetSelection()
 				if selected <= 0 {
 					return nil

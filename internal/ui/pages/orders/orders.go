@@ -19,7 +19,7 @@ func Page(a *model.App) tview.Primitive {
 
 	page := tview.NewFlex()
 	page.SetDirection(tview.FlexRow).
-		SetTitle("Order Book"+" | "+a.UserProfile.Data.UserName+"  |  "+"Press h (history) | d (more detail) | t (order history) | k (order's trades)  ").SetBorder(true).SetTitleAlign(tview.AlignLeft).SetBorderPadding(2, 2, 4, 0)
+		SetTitle("Order Book"+" | "+a.UserProfile.Data.UserName+"  |  "+"Press h (history) | d (more detail) | t (order history) | o (order's trades)  ").SetBorder(true).SetTitleAlign(tview.AlignLeft).SetBorderPadding(2, 2, 4, 0)
 	// AddItem(banner, 10, 1, false).
 	page.AddItem(table, 0, 2, true)
 
