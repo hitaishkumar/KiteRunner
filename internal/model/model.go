@@ -161,6 +161,15 @@ func OpenDashboardMenu(a *App) {
 		menu := GlobalMenu(a, GetDashboardMenuItems(a))
 		OpenMenu(a, menu)
 		return
+	case "orders":
+		menu := GlobalMenu(a, GetOrdersMenuItems(a))
+		OpenMenu(a, menu)
+		return
+	default:
+		menu := GlobalMenu(a, GetOrdersMenuItems(a))
+		OpenMenu(a, menu)
+		return
+
 	}
 }
 

@@ -54,19 +54,21 @@ func GetLoginMenuItems(a *App) []MenuItem {
 				CloseMenu(a)
 			},
 		},
-	}
-}
-
-func GetDashboardMenuItems(a *App) []MenuItem {
-	return []MenuItem{
 		{
-			Title:    "GO to Login",
-			Shortcut: rune(config.C.Shortcuts.GotoDashboard[0]),
+			Title:    "Orders",
+			Shortcut: rune(config.C.Shortcuts.GoToOrders[0]),
 			Action: func(a *App) {
-				a.CurrentPage = "login"
-				a.Pages.SwitchToPage("login")
+				a.CurrentPage = "orders"
+				a.Pages.SwitchToPage("orders")
 				CloseMenu(a)
 			},
 		},
 	}
+}
+
+func GetDashboardMenuItems(a *App) []MenuItem {
+	return GetLoginMenuItems(a)
+}
+func GetOrdersMenuItems(a *App) []MenuItem {
+	return GetLoginMenuItems(a)
 }
