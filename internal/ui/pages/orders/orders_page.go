@@ -25,11 +25,4 @@ func Page(a *model.App) tview.Primitive {
 
 	return page
 
-	// // Wrapping inside your banner + layout system
-	// banner := tview.NewTextView().
-	// 	SetText("[blue]Orders Book").
-	// 	SetTextAlign(tview.AlignCenter)
-	// banner.SetDynamicColors(true)
-
-	// return layout.WithBanner(banner, table, a)
 }

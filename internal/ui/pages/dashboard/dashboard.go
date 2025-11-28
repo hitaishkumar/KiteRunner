@@ -7,124 +7,159 @@ import (
 	"KiteRunner/internal/ui/banner"
 	"KiteRunner/internal/ui/layout"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 func Dashboard(a *model.App) tview.Primitive {
-	userData := a.UserProfile // ← Clean + works
+	user := a.UserProfile.Data
 
-	// -----------------------------
-	// Banner
-	// -----------------------------
-	bannerView := tview.NewTextView()
-	bannerView.SetText(banner.SmallBanner())
+	bannerView := tview.NewTextView().
+		SetText(banner.SmallBanner()).
+		SetDynamicColors(true)
 
-	// ============================================================
-	// BANK ACCOUNTS TABLE
-	// ============================================================
-	bankTable := tview.NewTable()
+	// ---------------------------------------------------------
+	// COMPACT TABLES
+	// ---------------------------------------------------------
+	bankTable := compactTable(
+		[]string{"Bank", "Account"},
+		func() int { return len(user.BankAccounts) },
+		func(i int) []string {
+			b := user.BankAccounts[i]
+			return []string{
+				trim(b.Name, 12),
+				trim(b.Account, 10),
+			}
+		})
 
-	bankTable.SetCell(0, 0, cellHeader("Bank"))
-	bankTable.SetCell(0, 1, cellHeader("Account"))
+	exchTable := compactTable(
+		[]string{"Exchange"},
+		func() int { return len(user.Exchanges) },
+		func(i int) []string {
+			return []string{trim(user.Exchanges[i], 12)}
+		})
 
-	for i, b := range userData.Data.BankAccounts {
-		row := i + 1
-		bankTable.SetCell(row, 0, cell(b.Name))
-		bankTable.SetCell(row, 1, cell(b.Account))
-	}
-
-	// ============================================================
-	// EXCHANGES TABLE
-	// ============================================================
-	exchTable := tview.NewTable()
-
-	exchTable.SetCell(0, 0, cellHeader("Exchange"))
-	for i, ex := range userData.Data.Exchanges {
-		exchTable.SetCell(i+1, 0, cell(ex))
-	}
-
-	// ============================================================
-	// PRODUCTS / ORDER TYPES TABLE
-	// ============================================================
-	prodTable := tview.NewTable()
-
-	prodTable.SetCell(0, 0, cellHeader("Products"))
-	prodTable.SetCell(0, 1, cellHeader("Order Types"))
-
-	maxLen := max(len(userData.Data.Products), len(userData.Data.OrderTypes))
-
-	for i := 0; i < maxLen; i++ {
-		if i < len(userData.Data.Products) {
-			prodTable.SetCell(i+1, 0, cell(userData.Data.Products[i]))
-		}
-		if i < len(userData.Data.OrderTypes) {
-			prodTable.SetCell(i+1, 1, cell(userData.Data.OrderTypes[i]))
-		}
-	}
-
-	// ============================================================
-	// DP IDs List
-	// ============================================================
-	dpList := tview.NewList()
-
-	for _, dp := range userData.Data.DpIds {
-		dpList.AddItem(dp, "", 0, nil)
-	}
-
-	// ============================================================
-	// META PANEL
-	// ============================================================
-	meta := tview.NewTextView()
-
-	meta.SetText(
-		fmt.Sprintf("[blue]POA: [white] %s\n", userData.Data.Meta.Poa) +
-			fmt.Sprintf("[blue]Silo: [white] %s\n", userData.Data.Meta.Silo),
+	prodTable := compactTwoColumn(
+		"Prod", "Order",
+		user.Products,
+		user.OrderTypes,
 	)
 
-	// ============================================================
-	// 2FA PANEL
-	// ============================================================
-	twofa := tview.NewTextView()
-	twofa.SetText(
-		fmt.Sprintf("[blue]Type: [white] %s\n", userData.Data.TwofaType) +
-			fmt.Sprintf("[blue]Timestamp: [white] %s\n", userData.Data.TwofaTimestamp),
-	)
+	// ---------------------------------------------------------
+	// COMPACT LISTS
+	// ---------------------------------------------------------
+	dpList := tview.NewList().ShowSecondaryText(false)
+	for _, dp := range user.DpIds {
+		dpList.AddItem(trim(dp, 14), "", 0, nil)
+	}
 
-	// ============================================================
-	// GRID LAYOUT
-	// ============================================================
+	meta := compactInfo(map[string]string{
+		"POA":  user.Meta.Poa,
+		"Silo": user.Meta.Silo,
+	})
+
+	twofa := compactInfo(map[string]string{
+		"Type": user.TwofaType,
+		"Time": user.TwofaTimestamp,
+	})
+
+	// ---------------------------------------------------------
+	// GRID (unchanged)
+	// ---------------------------------------------------------
 	grid := tview.NewGrid().
-		SetRows(7, 0, 0).
-		SetColumns(0, 0, 0).
-		SetBorders(true)
+		SetRows(3).
+		SetColumns(0, 0)
 
-	// Row 0: Full width userPanel
+	grid.SetBorders(true).SetBorderColor(tcell.ColorDarkRed)
 
-	// Row 1: 3 tables
-	grid.AddItem(bankTable, 1, 0, 1, 1, 0, 0, false)
-	grid.AddItem(exchTable, 1, 1, 1, 1, 0, 0, false)
-	grid.AddItem(prodTable, 1, 2, 1, 1, 0, 0, false)
+	grid.AddItem(bankTable, 1, 0, 1, 1, 0, 0, true)
+	grid.AddItem(exchTable, 1, 1, 1, 1, 0, 0, true)
+	grid.AddItem(prodTable, 1, 2, 1, 1, 0, 0, true)
 
-	// Row 2: misc items
-	grid.AddItem(dpList, 2, 0, 1, 1, 0, 0, false)
-	grid.AddItem(meta, 2, 1, 1, 1, 0, 0, false)
-	grid.AddItem(twofa, 2, 2, 1, 1, 0, 0, false)
+	grid.AddItem(dpList, 2, 0, 1, 1, 0, 0, true)
+	grid.AddItem(meta, 2, 1, 1, 1, 0, 0, true)
+	grid.AddItem(twofa, 2, 2, 1, 1, 0, 0, true)
 
 	return layout.WithContextBanner(bannerView, grid, a)
 }
 
-// ============================================================
-// Helper functions
-// ============================================================
+//
+// ----------------------------------------------------------
+// COMPACT HELPERS
+// ----------------------------------------------------------
+//
 
-func cellHeader(text string) *tview.TableCell {
-	return tview.NewTableCell("[yellow::b]" + text).
-		SetAlign(tview.AlignCenter)
+func compactTable(headers []string, rows func() int, data func(i int) []string) *tview.Table {
+	t := tview.NewTable().
+		SetBorders(true)
+
+	// header
+	for c, h := range headers {
+		t.SetCell(0, c,
+			tview.NewTableCell("[yellow::b]"+h).
+				SetAlign(tview.AlignLeft).
+				SetExpansion(2),
+		)
+	}
+
+	// rows
+	for i := 0; i < rows(); i++ {
+		cols := data(i)
+		for c, v := range cols {
+			t.SetCell(i+1, c,
+				tview.NewTableCell(v).
+					SetAlign(tview.AlignLeft))
+		}
+	}
+
+	return t
 }
 
-func cell(text string) *tview.TableCell {
+func compactTwoColumn(h1, h2 string, left, right []string) *tview.Table {
+	t := tview.NewTable()
+
+	t.SetCell(0, 0, compactHeader(h1))
+	t.SetCell(0, 1, compactHeader(h2))
+
+	n := max(len(left), len(right))
+	for i := 0; i < n; i++ {
+		if i < len(left) {
+			t.SetCell(i+1, 0, compactCell(trim(left[i], 12)))
+		}
+		if i < len(right) {
+			t.SetCell(i+1, 1, compactCell(trim(right[i], 12)))
+		}
+	}
+
+	return t
+}
+
+func compactHeader(text string) *tview.TableCell {
+	return tview.NewTableCell("[yellow::b]" + text).
+		SetAlign(tview.AlignLeft)
+}
+
+func compactCell(text string) *tview.TableCell {
 	return tview.NewTableCell(text).
-		SetAlign(tview.AlignCenter)
+		SetAlign(tview.AlignLeft)
+}
+
+func compactInfo(m map[string]string) *tview.TextView {
+	tv := tview.NewTextView().
+		SetDynamicColors(true)
+
+	for k, v := range m {
+		tv.Write([]byte(fmt.Sprintf("[blue]%s:[white] %s\n", k, trim(v, 14))))
+	}
+
+	return tv
+}
+
+func trim(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n-1] + "…"
 }
 
 func max(a, b int) int {

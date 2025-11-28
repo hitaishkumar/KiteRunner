@@ -63,6 +63,15 @@ func GetLoginMenuItems(a *App) []MenuItem {
 				CloseMenu(a)
 			},
 		},
+		{
+			Title:    "Streams",
+			Shortcut: rune(config.C.Shortcuts.GoToStreams[0]),
+			Action: func(a *App) {
+				a.CurrentPage = "streams"
+				a.Pages.SwitchToPage("streams")
+				CloseMenu(a)
+			},
+		},
 	}
 }
 

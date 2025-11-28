@@ -4,7 +4,6 @@ import (
 	"KiteRunner/internal/model"
 	"fmt"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -39,7 +38,6 @@ func WithContextBanner(banner tview.Primitive, content tview.Primitive, app *mod
 		SetDirection(tview.FlexColumn).
 		AddItem(banner, 100, 0, false). // banner width
 		AddItem(userPanel, 0, 1, false) // user panel takes remaining width
-	topBar.SetBorder(true).SetBorderColor(tcell.ColorIndianRed)
 
 	// ----------------------------------
 	// FINAL LAYOUT (TopRow + Content)

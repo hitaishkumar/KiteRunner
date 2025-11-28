@@ -20,7 +20,7 @@ func AllOrdersTable(a *model.App, orders []model.Order) *tview.Table {
 
 	// HEADERS
 	headers := []string{
-		"Order ID", "Symbol", "Status",
+		"Seq", "Order ID", "Symbol", "Status",
 		"Type", "Txn", "Price", "Qty",
 		"Filled", "Pending", "Avg Price",
 		"Exchange", "Timestamp",
@@ -36,18 +36,19 @@ func AllOrdersTable(a *model.App, orders []model.Order) *tview.Table {
 	for r, o := range orders {
 		row := r + 1
 
-		table.SetCell(row, 0, cell(o.OrderID))
-		table.SetCell(row, 1, cell(o.TradingSymbol))
-		table.SetCell(row, 2, statusCell(o.Status))
-		table.SetCell(row, 3, cell(o.OrderType))
-		table.SetCell(row, 4, statusCell(o.TransactionType)) // BUY/SELL colored
-		table.SetCell(row, 5, cellFloat(o.Price))
-		table.SetCell(row, 6, cellInt(o.Quantity))
-		table.SetCell(row, 7, cellInt(o.FilledQuantity))
-		table.SetCell(row, 8, cellInt(o.PendingQuantity))
-		table.SetCell(row, 9, cellFloat(o.AveragePrice))
-		table.SetCell(row, 10, cell(o.Exchange))
-		table.SetCell(row, 11, cell(o.OrderTimestamp))
+		table.SetCell(row, 0, cellInt(r+1))
+		table.SetCell(row, 1, cell(o.OrderID))
+		table.SetCell(row, 2, cell(o.TradingSymbol))
+		table.SetCell(row, 3, statusCell(o.Status))
+		table.SetCell(row, 4, cell(o.OrderType))
+		table.SetCell(row, 5, statusCell(o.TransactionType)) // BUY/SELL colored
+		table.SetCell(row, 6, cellFloat(o.Price))
+		table.SetCell(row, 7, cellInt(o.Quantity))
+		table.SetCell(row, 8, cellInt(o.FilledQuantity))
+		table.SetCell(row, 9, cellInt(o.PendingQuantity))
+		table.SetCell(row, 10, cellFloat(o.AveragePrice))
+		table.SetCell(row, 11, cell(o.Exchange))
+		table.SetCell(row, 12, cell(o.OrderTimestamp))
 	}
 
 	// ---------------------------------------------------------
@@ -149,7 +150,7 @@ func cell(txt string) *tview.TableCell {
 	return tview.NewTableCell(txt).SetAlign(tview.AlignCenter)
 }
 
-func cellInt(v int64) *tview.TableCell {
+func cellInt(v int) *tview.TableCell {
 	return cell(fmt.Sprintf("%d", v))
 }
 

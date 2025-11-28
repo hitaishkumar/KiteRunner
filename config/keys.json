@@ -8,6 +8,7 @@
     "quit": "q",
     "goto_instruments": "t",
     "goto_quotes": "k",
-    "goto_orders": "o"
+    "goto_orders": "o",
+    "goto_streams": "s"
   }
 }
