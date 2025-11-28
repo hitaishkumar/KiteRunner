@@ -26,13 +26,13 @@ type Order struct {
 	Validity           string                 `json:"validity"`
 	ValidityTTL        int64                  `json:"validity_ttl"`
 	Product            string                 `json:"product"`
-	Quantity           int64                  `json:"quantity"`
-	DisclosedQuantity  int64                  `json:"disclosed_quantity"`
+	Quantity           int                    `json:"quantity"`
+	DisclosedQuantity  int                    `json:"disclosed_quantity"`
 	Price              float64                `json:"price"`
 	TriggerPrice       float64                `json:"trigger_price"`
 	AveragePrice       float64                `json:"average_price"`
-	FilledQuantity     int64                  `json:"filled_quantity"`
-	PendingQuantity    int64                  `json:"pending_quantity"`
+	FilledQuantity     int                    `json:"filled_quantity"`
+	PendingQuantity    int                    `json:"pending_quantity"`
 	CancelledQuantity  int64                  `json:"cancelled_quantity"`
 	AuctionNumber      *string                `json:"auction_number"`
 	MarketProtection   int64                  `json:"market_protection"`
@@ -84,7 +84,7 @@ type OrderTrade struct {
 	InstrumentToken   int64   `json:"instrument_token"`
 	Product           string  `json:"product"`
 	AveragePrice      float64 `json:"average_price"`
-	Quantity          int64   `json:"quantity"`
+	Quantity          int     `json:"quantity"`
 	ExchangeOrderID   string  `json:"exchange_order_id"`
 	TransactionType   string  `json:"transaction_type"`
 	FillTimestamp     string  `json:"fill_timestamp"`

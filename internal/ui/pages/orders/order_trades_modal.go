@@ -19,10 +19,11 @@ func OpenOrderTradesModal(a *model.App, trades []model.OrderTrade, order model.O
 	// BUILD TABLE
 	table := tview.NewTable().
 		SetBorders(true).
+		SetFixed(1, 0).
 		SetSelectable(true, false)
 
 	headers := []string{
-		"Trade ID", "Txn", "Price", "Qty",
+		"Seq", "Trade ID", "Txn", "Price", "Qty",
 		"Exchange", "Symbol", "Fill TS", "Order TS",
 	}
 
@@ -37,14 +38,15 @@ func OpenOrderTradesModal(a *model.App, trades []model.OrderTrade, order model.O
 	// ROWS
 	for i, t := range trades {
 		r := i + 1
-		table.SetCell(r, 0, cell(t.TradeID))
-		table.SetCell(r, 1, statusCell(t.TransactionType))
-		table.SetCell(r, 2, cellFloat(t.AveragePrice))
-		table.SetCell(r, 3, cellInt(t.Quantity))
-		table.SetCell(r, 4, cell(t.Exchange))
-		table.SetCell(r, 5, cell(t.TradingSymbol))
-		table.SetCell(r, 6, cell(t.FillTimestamp))
-		table.SetCell(r, 7, cell(t.OrderTimestamp))
+		table.SetCell(r, 0, cellInt(i+1))
+		table.SetCell(r, 1, cell(t.TradeID))
+		table.SetCell(r, 2, statusCell(t.TransactionType))
+		table.SetCell(r, 3, cellFloat(t.AveragePrice))
+		table.SetCell(r, 4, cellInt(t.Quantity))
+		table.SetCell(r, 5, cell(t.Exchange))
+		table.SetCell(r, 6, cell(t.TradingSymbol))
+		table.SetCell(r, 7, cell(t.FillTimestamp))
+		table.SetCell(r, 8, cell(t.OrderTimestamp))
 	}
 
 	// WRAP IN FRAME (border + title)

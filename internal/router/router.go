@@ -21,4 +21,6 @@ func Register(a *model.App) {
 	a.Pages.AddPage("quotes", quotesPage, true, false)
 	a.Pages.AddPage("orders", orders.Page(a), true, false)
 	a.Pages.AddPage("order_history", orders.Page(a), true, false)
+	// a.Pages.AddPage("streams", streaming.StreamingChartsPage(a), true, false)
+
 }

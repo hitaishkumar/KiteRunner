@@ -15,6 +15,7 @@ type Shortcuts struct {
 	GoToInstruments string `json:"goto_instruments"`
 	GoToQuotes      string `json:"goto_quotes"`
 	GoToOrders      string `json:"goto_orders"`
+	GoToStreams     string `json:"goto_streams"`
 }
 
 type Config struct {

@@ -31,7 +31,7 @@ func Instruments(a *model.App) tview.Primitive {
 
 	// HEADER
 	headers := []string{
-		"Token", "Symbol", "Name", "Price",
+		"Seq", "Token", "Symbol", "Name", "Price",
 		"Strike", "Expiry", "Lot", "Exchange",
 	}
 
@@ -45,14 +45,15 @@ func Instruments(a *model.App) tview.Primitive {
 	// ROWS
 	for i, inst := range instruments {
 		r := i + 1
-		table.SetCell(r, 0, cellInt(inst.InstrumentToken))
-		table.SetCell(r, 1, cell(inst.TradingSymbol))
-		table.SetCell(r, 2, cell(inst.Name))
-		table.SetCell(r, 3, cellFloat(inst.LastPrice))
-		table.SetCell(r, 4, cellFloat(inst.Strike))
-		table.SetCell(r, 5, cell(inst.Expiry))
-		table.SetCell(r, 6, cellInt(inst.LotSize))
-		table.SetCell(r, 7, cell(inst.Exchange))
+		table.SetCell(r, 0, cellInt(r))
+		table.SetCell(r, 1, cellInt(inst.InstrumentToken))
+		table.SetCell(r, 2, cell(inst.TradingSymbol))
+		table.SetCell(r, 3, cell(inst.Name))
+		table.SetCell(r, 4, cellFloat(inst.LastPrice))
+		table.SetCell(r, 5, cellFloat(inst.Strike))
+		table.SetCell(r, 6, cell(inst.Expiry))
+		table.SetCell(r, 7, cellInt(inst.LotSize))
+		table.SetCell(r, 8, cell(inst.Exchange))
 	}
 
 	// Respect NAV / INSERT mode
