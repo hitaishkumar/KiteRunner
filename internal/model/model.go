@@ -305,12 +305,12 @@ func OpenDashboardMenu(a *App) {
 		OpenFuzzyModal(a, menu)
 		return
 	case "orders":
-		menu := GlobalMenu(a, GetOrdersMenuItems(a))
-		OpenMenu(a, menu)
+		menu := BuildFuzzyModal(a, GetOrdersMenuItems(a))
+		OpenFuzzyModal(a, menu)
 		return
 	default:
-		menu := GlobalMenu(a, GetOrdersMenuItems(a))
-		OpenMenu(a, menu)
+		menu := BuildFuzzyModal(a, GetOrdersMenuItems(a))
+		OpenFuzzyModal(a, menu)
 		return
 
 	}
