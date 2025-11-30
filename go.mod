@@ -3,12 +3,13 @@ module KiteRunner
 go 1.24.4
 
 require (
+	github.com/NimbleMarkets/ntcharts v0.3.1
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/rivo/tview v0.42.0
+	github.com/zerodha/gokiteconnect/v4 v4.3.5
 )
 
 require (
-	github.com/NimbleMarkets/ntcharts v0.3.1 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
 	github.com/charmbracelet/bubbletea v1.2.2 // indirect
@@ -19,6 +20,9 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/gdamore/encoding v1.0.1 // indirect
+	github.com/gocarina/gocsv v0.0.0-20180809181117-b8c38cb1ba36 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/lrstanley/bubblezone v0.0.0-20240914071701-b48c55a5e78e // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

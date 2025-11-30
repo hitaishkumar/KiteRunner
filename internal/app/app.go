@@ -21,6 +21,8 @@ func New() *model.App {
 		Mode:        model.ModeNavigation, // <--- ADD
 		FooterLeft:  tview.NewTextView(),
 		FooterRight: tview.NewTextView(),
+		ApiKey:      "1ndnlywkjr411psn",
+		ApiSecret:   "pmfg9e1a0qkno4qawykkl5mf8dw2qxjr",
 	}
 
 	// Load user profile JSON

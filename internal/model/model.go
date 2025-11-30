@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	kiteticker "github.com/zerodha/gokiteconnect/v4/ticker"
 )
 
 type UIMode int
@@ -25,6 +26,9 @@ type App struct {
 	FooterLeft  *tview.TextView
 	FooterRight *tview.TextView
 	Footer      *tview.Flex
+	Ticker      *kiteticker.Ticker
+	ApiKey      string
+	ApiSecret   string
 }
 
 // Run MUST be in same package as App

@@ -7,6 +7,7 @@ import (
 	login "KiteRunner/internal/ui/pages/login"
 	"KiteRunner/internal/ui/pages/orders"
 	quotes "KiteRunner/internal/ui/pages/quotes"
+	streaming "KiteRunner/internal/ui/pages/streaming"
 )
 
 func Register(a *model.App) {
@@ -21,6 +22,6 @@ func Register(a *model.App) {
 	a.Pages.AddPage("quotes", quotesPage, true, false)
 	a.Pages.AddPage("orders", orders.Page(a), true, false)
 	a.Pages.AddPage("order_history", orders.Page(a), true, false)
-	// a.Pages.AddPage("streams", streaming.StreamingChartsPage(a), true, false)
+	a.Pages.AddPage("streams", streaming.StreamingChartsPage(a), true, false)
 
 }
