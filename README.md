@@ -4,25 +4,23 @@ KiteRunner is an open-source, terminal-based trading interface built on the **Ki
 
 ---
 
-## 📸 Screenshots
-
-### 🔐 Login Page
+### Login Page
 
 ![Login Page](<assets/image%20(2).png>)
 
-### 🧭 Menu Page
+### Menu Page
 
 ![Menu Page](<assets/image%20(3).png>)
 
-### 🏠 Home Page
+### Home Page
 
 ![Home Page](<assets/image%20(4).png>)
 
-### 📊 Instruments Page
+### Instruments Page
 
 ![Instruments Page](<assets/image%20(5).png>)
 
-### 📜 Order History Page
+### Order History Page
 
 In the Order History menu, you can:
 
@@ -32,105 +30,90 @@ In the Order History menu, you can:
 
 ![Order History Page](<assets/image%20(7).png>)
 
-### 💼 Trade Book for an Order
+### Trade Book for an Order
 
 ![Trade Book](<assets/image%20(8).png>)
 
-### 📄 Order Details Page
+### Order Details Page
 
 ![Order Details](<assets/image%20(9).png>)
 
-### 📜 Extended Order History
+### Extended Order History
 
 ![Extended Order History](<assets/image%20(10).png>)
 
+## Features
+
+### Current Functionality
+
+KiteRunner currently supports the core workflows needed for trading directly from the terminal:
+
+- Interactive CLI interface built using Go and tview
+- Secure login and session handling
+- Live market data streaming (LTP, OHLC, market depth)
+- Ability to place, modify, and cancel orders
+- Complete order history and trade book view
+- Access to portfolio, positions, holdings, and available funds
+- Fast instrument search and filtering
+- Concurrent data fetchers to reduce latency
+
 ---
 
-## 🚀 Features
+## Roadmap / Upcoming Features
 
-### ✅ **Current Functionality**
+These are the planned improvements and additions, based on what the Kite Connect API supports and what I find useful.
 
-- 🧰 Fully interactive **CLI UI** using Go + Cobra
-- 🔑 Secure login/session handling
-- 📈 Live market data streaming (LTP, OHLC, depth)
-- 🛒 Order placement, modification, cancellation
-- 📜 Full order history + trade book view
-- 💼 Portfolio, positions, holdings, funds info
-- 🔍 Instrument search + filtering
-- 🧵 Concurrent data fetchers for low-latency performance
-- 🧱 Clean modular code structure (`auth/`, `orders/`, `quotes/`, `ws/`, `cmd/`, etc.)
+### Order Types
 
----
-
-## 🔮 Roadmap / Upcoming Features
-
-Based on capabilities supported by the **Kite Connect API**, these features are planned:
-
-### 📦 **Order Types**
-
-- Support for _all_ order varieties:
+- Support for all order varieties:
   - Market, Limit, SL, SL-M
   - Cover Orders (CO)
   - Iceberg Orders
   - After Market Orders (AMO)
 
-### 🎯 **GTT / Conditional Orders**
+### GTT / Conditional Orders
 
-- Create, view, and manage Good-Till-Triggered (GTT) orders
-- Automate trade execution based on price triggers
+- Create and manage Good-Till-Triggered (GTT) orders
+- Trigger-based automated execution
 
-### 📉 **Historical Data + Backtesting**
+### Historical Data and Backtesting
 
-- Fetch historical candle data (1m, 5m, 15m, EOD)
-- Run CLI-based backtesting for quick strategy checks
+- Fetch historical candle data (1-minute, 5-minute, 15-minute, end-of-day)
+- Basic CLI-based backtesting for simple strategy validation
 
-### 🧺 **Basket Orders**
+### Basket Orders
 
-- Create and execute multiple orders as a single basket
-- Perfect for multi-leg strategies and rebalancing
+- Create and execute multiple orders as a basket
+- Useful for multi-leg strategies and quick portfolio rebalancing
 
-### 🔔 **Postbacks / Webhooks**
+### Postbacks and Webhooks
 
-- Real-time order/trade notifications pushed to your CLI or custom scripts
+- Real-time order and trade updates pushed to the terminal or user scripts
 
-### 💸 **Advanced Portfolio Insights**
+### Advanced Portfolio Insights
 
 - Margin breakdown
-- P&L summaries
-- Risk/volatility estimates (if supported by API limits)
+- Basic P&L summaries
+- Optional risk and volatility indicators (depending on API limitations)
 
-### ⚙️ **Developer/Power User Features**
+### Developer and Power-User Features
 
-- Strategy tags for orders
-- JSON/CSV export of history, trades, and live ticks
-- CLI auto-complete, watchlists, presets
-- Functional options for clean configuration (API key, timeouts, logging)
-
----
+- Strategy tags for organizing and tracking orders
+- Export of trade history and market data to JSON or CSV
+- CLI auto-complete, watchlists, and presets
+- More flexible configuration (API keys, timeouts, logging options)
 
 ## 🏗️ Built With
 
 - **Golang** (main engine)
-- **Cobra** (CLI framework)
+- **Cobra** (tview framework)
 - **Kite Connect API** (trading + data layer)
 - **WebSockets** (market streaming)
 
 ---
 
-## 📂 Project Link
-
-👉 https://github.com/hitaishkumar/KiteRunner
-
----
-
 ## 🤝 Contributing
 
-PRs are welcome! Feel free to open issues, suggest new features, or help improve documentation.
-
----
-
-## 📜 License
-
-Apache-2.0 License
+PRs are very welcome!
 
 ---
